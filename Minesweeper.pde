@@ -3,12 +3,13 @@
 import de.bezier.guido.*;
 private final static int NUM_ROWS = 20;
 private final static int NUM_COLS = 20;
+private final static int NUM_BOMBS = 10;
 private MSButton[][] buttons; //2d array of minesweeper buttons
 private ArrayList <MSButton> bombs; //ArrayList of just the minesweeper buttons that are mined
 
 void setup ()
 {
-    size(400, 500);
+    size(400, 400);
     textAlign(CENTER,CENTER);
     buttons = new MSButton [20][20];
     bombs  = new ArrayList <MSButton>();
@@ -24,39 +25,72 @@ void setup ()
 
 public void setBombs()
 {
-    int row = (int)(Math.random()*NUM_ROWS);
-    int col = (int)(Math.random()*NUM_COLS);
-    if (!bombs.contains(buttons[row][col]))
-        bombs.add(buttons[row][col]);
+    for (int i = 0; i <= NUM_BOMBS; i++) {
+        int row = (int)(Math.random()*NUM_ROWS);
+        int col = (int)(Math.random()*NUM_COLS);
+        if (!bombs.contains(buttons[row][col]))
+            bombs.add(buttons[row][col]);
+    }
 }
 
 public void draw ()
 {
     background( 0 );
-    if(isWon())
+    if(isWon()) {
         displayWinningMessage();
+    }
+    if(isBombPressed()) {
+        displayLosingMessage();
+    }
 }
 public boolean isWon()
 {
     int markedBombs = 0;
     for (int i = 0; i < bombs.size(); i++)
         if (bombs.get(i).isMarked())
-            markedBombs+=1;
-    if (markedBombs == bombs.size())
+            markedBombs++;
+    if (markedBombs == NUM_BOMBS+1)
         return true;
+    return false;
+}
+public boolean isBombPressed()
+{
+    for (int i = 0; i< bombs.size(); i++)
+        if (bombs.get(i).isClicked())
+            return true;
     return false;
 }
 public void displayLosingMessage()
 {
-    if (isWon() == false)
-        stroke(255);
-        text("Try again!! :)", 200, 450);
+    stroke(255);
+    for (int r = 0; r< NUM_ROWS; r++) {
+        for (int c = 0; c<NUM_COLS; c++)
+            if (bombs.contains(buttons[r][c]) && !buttons[r][c].isMarked())
+                buttons[r][c].marked = true;
+    }
+    buttons[10][4].setLabel("T");
+    buttons[10][5].setLabel("r");
+    buttons[10][6].setLabel("y");
+    buttons[10][7].setLabel(" ");
+    buttons[10][8].setLabel("a");
+    buttons[10][9].setLabel("g");
+    buttons[10][10].setLabel("a");
+    buttons[10][11].setLabel("i");
+    buttons[10][12].setLabel("n");
+    buttons[10][13].setLabel("?");
 }
 public void displayWinningMessage()
 {
-    if (isWon())
-        stroke(255);
-        text("Yay! You won!!", 200, 450);
+    buttons[10][4].setLabel("Y");
+    buttons[10][5].setLabel("o");
+    buttons[10][6].setLabel("u");
+    buttons[10][7].setLabel(" ");
+    buttons[10][8].setLabel("w");
+    buttons[10][9].setLabel("o");
+    buttons[10][10].setLabel("n");
+    buttons[10][11].setLabel("!");
+    buttons[10][12].setLabel("!");
+    buttons[10][13].setLabel("!");
 }
 
 public class MSButton
@@ -90,19 +124,15 @@ public class MSButton
     
     public void mousePressed () 
     {
-        clicked = true;
-        if (keyPressed == true) {
-            if (marked == true)
-                marked = false;
-            else if (marked == false)
-                marked = true;
-        }
-        else if (bombs.contains(this))
-            displayLosingMessage();
-        else if (countBombs(r, c)>0)
+        if (mouseButton == LEFT)
+            clicked = true;
+        if (mouseButton == RIGHT)
+            marked = !marked;
+        else if (countBombs(r, c)>0 && isMarked() == false)
             label = " " + countBombs(r, c);
         else
         {
+        
           if(isValid(r, c-1) && !buttons[r][c-1].isClicked())
             buttons[r][c-1].mousePressed();
           if(isValid(r-1, c) && !buttons[r-1][c].isClicked())
@@ -111,6 +141,25 @@ public class MSButton
             buttons[r][c+1].mousePressed();
           if(isValid(r+1, c) && !buttons[r+1][c].isClicked())
             buttons[r+1][c].mousePressed();
+        
+/*
+        if (isValid(r+1, c)&& !buttons[r+1][c].clicked)
+            buttons[r+1][c].mousePressed();
+        else if (isValid(r-1, c) && !buttons[r-1][c].clicked)
+            buttons[r-1][c].mousePressed();
+        else if (isValid(r, c+1) && !buttons[r][c+1].clicked)
+            buttons[r][c+1].mousePressed();
+        else if (isValid(r, c-1) && !buttons[r][c-1].clicked)
+            buttons[r][c-1].mousePressed();
+        else if (isValid(r+1, c+1) && !buttons[r+1][c+1].clicked)
+            buttons[r+1][c+1].mousePressed();
+        else if (isValid(r-1, c-1) && !buttons[r-1][c-1].clicked)
+            buttons[r-1][c-1].mousePressed();
+        else if (isValid(r-1, c+1) && !buttons[r-1][c+1].clicked)
+            buttons[r-1][c+1].mousePressed();
+        else if (isValid(r+1, c-1) && !buttons[r+1][c-1].clicked)
+            buttons[r+1][c-1].mousePressed();
+*/
         }
     }
 
